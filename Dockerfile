@@ -1,28 +1,37 @@
-# Use the official Node.js image.
-FROM node:18
+# Stage 1: Build Stage
+FROM node:18-alpine AS build
 
-# Set the working directory.
+# Set the working directory
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json.
+# Copy only package.json and package-lock.json to install dependencies first
 COPY package*.json ./
 
-# Install dependencies.
+# Install all dependencies (including devDependencies)
 RUN npm install
 
-# Copy the rest of your application code.
+# Copy the rest of the application files
 COPY . .
 
-# Install TypeScript globally.
-RUN npm install -g typescript
+# Build TypeScript code
+RUN npm run build
 
-# Compile TypeScript code.
-# RUN npx tsc
+# Stage 2: Production Image
+FROM node:18-alpine AS production
 
-# RUN npm run build
+# Set the working directory
+WORKDIR /usr/src/app
 
-# Expose the application port.
+# Copy only the necessary files from the build stage
+COPY --from=build /usr/src/app/package*.json ./
+COPY --from=build /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/build ./build
+
+# Install only production dependencies
+RUN npm prune --production
+
+# Expose the port
 EXPOSE 5000
 
-# Command to run the application.
-CMD ["npm", "run", "dev"]
+# Run the compiled JavaScript application
+CMD ["node", "build/index.js"]

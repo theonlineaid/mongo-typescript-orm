@@ -1,5 +1,5 @@
 
-import express, { Express } from 'express';
+import express, { Express, Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 // import { PrismaClient } from '@prisma/client';
 // import { errorMiddleware } from './middlewares/error';
@@ -29,6 +29,24 @@ app.use(express.json());
 app.use(cookieParser());
 // app.use(errorMiddleware);
 // app.use('/api', RootRouter)
+
+// Test API endpoints
+app.get('/', (req: Request, res: Response) => {
+    res.json({ message: 'API is working!' });
+});
+
+app.post('/api/echo', (req: Request, res: Response) => {
+    const body = req.body;
+    res.json({ 
+        message: 'Echo endpoint',
+        receivedData: body 
+    });
+});
+
+app.get('/api/hello/:name', (req: Request, res: Response) => {
+    const name = req.params.name;
+    res.json({ message: `Hello, ${name}!` });
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
