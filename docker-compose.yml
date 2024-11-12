@@ -1,0 +1,27 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=mongodb+srv://${DB_USER}:${DB_PASS}@cluster0.6lshb.mongodb.net/${DB}?retryWrites=true&w=majority
+    depends_on:
+      - db
+    volumes:
+      - .:/usr/src/app
+
+  db:
+    image: mongo:latest
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASS}
+    ports:
+      - "27017:27017"
+    volumes:
+      - db_data:/data/db
+
+volumes:
+  db_data:
