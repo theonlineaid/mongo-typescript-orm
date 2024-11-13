@@ -1,37 +1,33 @@
-# Stage 1: Build Stage
-FROM node:18-alpine AS build
+# Stage 1: Base image for building the app
+FROM node:18.16.0-alpine AS base
 
-# Set the working directory
-WORKDIR /usr/src/app
+# Set the working directory inside the container
+WORKDIR /app
 
-# Copy only package.json and package-lock.json to install dependencies first
-COPY package*.json ./
+# Copy package.json and install dependencies
+COPY package.json package-lock.json ./
 
-# Install all dependencies (including devDependencies)
 RUN npm install
 
-# Copy the rest of the application files
-COPY . .
+# Copy the application code and TypeScript config for building
+COPY src ./src
+COPY tsconfig.json ./
 
-# Build TypeScript code
+# Build the application
 RUN npm run build
 
-# Stage 2: Production Image
-FROM node:18-alpine AS production
+# Stage 2: Production image
+FROM node:18.16.0-alpine AS production
 
-# Set the working directory
-WORKDIR /usr/src/app
+# Set the working directory inside the container
+WORKDIR /app
 
 # Copy only the necessary files from the build stage
-COPY --from=build /usr/src/app/package*.json ./
-COPY --from=build /usr/src/app/node_modules ./node_modules
-COPY --from=build /usr/src/app/build ./build
+COPY --from=base /app/node_modules ./node_modules
+COPY --from=base /app/package.json ./package.json
+COPY --from=base /app/dist ./dist
 
-# Install only production dependencies
-RUN npm prune --production
-
-# Expose the port
+# Expose the application port
 EXPOSE 5000
 
-# Run the compiled JavaScript application
-CMD ["node", "build/index.js"]
+CMD ["npm", "run", "start"]
