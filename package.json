@@ -4,10 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "devlopment": "npx nodemon",
     "build": "tsc",
-    "dev": "NODE_ENV=development npx ts-node src/index.ts",
-    "start": "NODE_ENV=production node dist/index"
+    "dev": "NODE_ENV=development npx nodemon",
+    "prod": "NODE_ENV=production node dist/index"
   },
   "keywords": [],
   "author": "",
