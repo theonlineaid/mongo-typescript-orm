@@ -2,11 +2,11 @@
 import express, { Express, Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 // import { PrismaClient } from '@prisma/client';
-// import { errorMiddleware } from './middlewares/error';
 // import { PORT } from './utils/secret';
-// import RootRouter from './routes';
+import RootRouter from './routes';
 import cors from 'cors';
 import morgan from 'morgan'
+import { errorMiddleware } from './middlewars/error';
 // import path from 'path';
 
 const PORT = process.env.PORT || 5000;
@@ -27,8 +27,8 @@ app.use(express.json());
 // app.use('/uploads', express.static(path.join(__dirname, './uploads')));
 
 app.use(cookieParser());
-// app.use(errorMiddleware);
-// app.use('/api', RootRouter)
+app.use(errorMiddleware);
+app.use('/api', RootRouter)
 
 // Test API endpoints
 app.get('/', (req: Request, res: Response) => {
